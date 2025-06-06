@@ -20,6 +20,6 @@ export interface SessionDocument extends mongoose.Document {
   updatedAt: Date;
 }
 export type UserWithoutPassword = Omit<UserDocument, "password">;
-export type DecodedUser = UserDocument["_id"] & {
+export type DecodedUser = UserWithoutPassword & {
   session: SessionDocument["_id"];
 };

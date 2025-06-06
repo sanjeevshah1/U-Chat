@@ -1,19 +1,24 @@
 import mongoose, { Document, model, Schema } from "mongoose";
 
-const messageSchema = new Schema({
-  senderId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+const messageSchema = new Schema(
+  {
+    senderId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    receiverId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    text: { type: String },
+    image: { type: String },
   },
-  receiverId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+  {
+    timestamps: true,
   },
-  text: { type: String, required: true },
-  image: { type: String, optional: true },
-});
+);
 interface MessageSchemaType {
   senderId: mongoose.Schema.Types.ObjectId;
   receiverId: mongoose.Schema.Types.ObjectId;

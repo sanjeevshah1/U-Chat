@@ -72,6 +72,9 @@ export const updateUser = async (body: UpdateUserSchemaType["body"]) => {
       const hash = bcrypt.hashSync(body.updates.password, salt);
       body.updates.password = hash;
     }
+    // if (body.updates.profilePicture) {
+    //   const uploadResponse = await cloudinary.uploader.upload(profilePicture);
+    // }
 
     const updatedUser = await User.updateOne(
       { email: body.email },

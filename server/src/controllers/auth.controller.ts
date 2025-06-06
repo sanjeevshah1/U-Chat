@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import mongoose from "mongoose";
+import { get } from "lodash";
 import {
   SignUpSchemaType,
   LoginSchemaType,
@@ -15,6 +16,8 @@ import { signinJwt } from "../utils/jwt.utils";
 import { UserWithoutPassword } from "../types";
 import jwt from "jsonwebtoken";
 import redis from "../utils/redis.utils";
+import cloudinary from "../utils/cloudinary.utils";
+import User from "../models/user.model";
 
 export const signUpHandler = async (
   req: Request<object, object, SignUpSchemaType["body"]>,
@@ -138,17 +141,18 @@ export const logoutHandler = async (req: Request, res: Response) => {
   console.log(req.cookies);
   const refreshToken = req.cookies.refreshToken;
   if (!refreshToken) res.status(400).json({ message: "No token provided" });
+  else {
+    try {
+      const decoded = jwt.decode(refreshToken) as { exp: number };
+      const ttl = decoded.exp - Math.floor(Date.now() / 1000);
 
-  try {
-    const decoded = jwt.decode(refreshToken) as { exp: number };
-    const ttl = decoded.exp - Math.floor(Date.now() / 1000);
-
-    await redis.set(`bl:${refreshToken}`, "1", "EX", ttl); // auto-expire when token expires
-    console.log();
-    res.clearCookie("refreshToken");
-    res.status(200).json({ message: "Logged out and token blacklisted" });
-  } catch (error) {
-    res.status(400).json({ message: "Invalid token", error: error });
+      await redis.set(`bl:${refreshToken}`, "1", "EX", ttl); // auto-expire when token expires
+      console.log();
+      res.clearCookie("refreshToken");
+      res.status(200).json({ message: "Logged out and token blacklisted" });
+    } catch (error) {
+      res.status(400).json({ message: "Invalid token", error: error });
+    }
   }
 };
 
@@ -190,6 +194,55 @@ export const updateProfileHandler = async (
       updatedUser: user,
     });
   } catch (error: unknown) {
+    res.status(500).json({
+      success: false,
+      message: error instanceof Error ? error.message : "Something went wrong",
+    });
+  }
+};
+
+export const getProfileHandler = async (req: Request, res: Response) => {
+  try {
+    const user = get(res, "locals.user");
+    res.status(200).send({
+      success: true,
+      message: "Profile get succesfully",
+      profile: user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error instanceof Error ? error.message : "Something went wrong",
+    });
+  }
+};
+export const updateProfilePictureHandler = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const { profilePicture } = req.body;
+    const userId = res.locals.user._id;
+    if (!profilePicture) {
+      res
+        .status(400)
+        .json({ success: false, message: "Profile Picture not given" });
+    } else {
+      const uploadResponse = await cloudinary.uploader.upload(profilePicture);
+      const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        {
+          profilePicture: uploadResponse.secure_url,
+        },
+        { new: true },
+      );
+      res.status(200).json({
+        success: true,
+        message: "Profile Picture Updated Succesfully",
+        updated: updatedUser,
+      });
+    }
+  } catch (error) {
     res.status(500).json({
       success: false,
       message: error instanceof Error ? error.message : "Something went wrong",

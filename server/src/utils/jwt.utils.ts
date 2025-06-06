@@ -20,7 +20,7 @@ export function verifyJwt(token: string): {
   decoded: DecodedUser | null;
   expired: boolean;
 } {
-  console.log("verify is executing");
+  console.log("The token is ", token);
   const publicKey = config.get<string>("publicKey");
   try {
     const decoded = jwt.verify(token, publicKey);
@@ -31,7 +31,7 @@ export function verifyJwt(token: string): {
     };
   } catch (error) {
     const err = error as Error;
-    console.log("the error is", err.message);
+    console.log("the error is", err);
     return {
       valid: false,
       decoded: null,

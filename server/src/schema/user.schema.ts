@@ -72,7 +72,6 @@ export const updateUserSchema = z.object({
           .min(6, "Password must be atleast 6 characters")
           .optional(),
         name: z.string().optional(),
-        profilePicture: z.string().optional(),
       })
       .refine((data) => Object.keys(data).length > 0, {
         message: "Atleast one update should be provided.",
