@@ -4,7 +4,7 @@ import { get } from "lodash";
 import {
   SignUpSchemaType,
   LoginSchemaType,
-  UpdateUserSchemaType,
+  UpdateProfileSchemaType,
 } from "../schema/user.schema";
 import {
   createUser,
@@ -183,7 +183,7 @@ export const refreshHandler = async (req: Request, res: Response) => {
 };
 
 export const updateProfileHandler = async (
-  req: Request<object, object, UpdateUserSchemaType["body"]>,
+  req: Request<object, object, UpdateProfileSchemaType["body"]>,
   res: Response,
 ) => {
   try {

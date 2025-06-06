@@ -8,6 +8,10 @@ import {
 import Contact from "../models/contact.model";
 import mongoose from "mongoose";
 import { findUser } from "../services/user.service";
+import {
+  AcceptContactRequestHandlerInput,
+  AddContactHandlerInput,
+} from "../schema/contact.schema";
 
 export const getContactsHandler = async (req: Request, res: Response) => {
   try {
@@ -60,7 +64,10 @@ export const deleteContactsHandler = async (req: Request, res: Response) => {
   }
 };
 
-export const addContactHandler = async (req: Request, res: Response) => {
+export const addContactHandler = async (
+  req: Request<object, object, AddContactHandlerInput["body"]>,
+  res: Response,
+) => {
   try {
     const currentUserId = res.locals.user._id;
     const { email } = req.body;
@@ -120,7 +127,7 @@ export const addContactHandler = async (req: Request, res: Response) => {
 };
 
 export const acceptContactRequestHandler = async (
-  req: Request,
+  req: Request<AcceptContactRequestHandlerInput["params"]>,
   res: Response,
 ) => {
   try {

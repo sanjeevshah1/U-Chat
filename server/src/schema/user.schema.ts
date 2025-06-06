@@ -52,7 +52,7 @@ export const deleteUserSchema = z.object({
 
 export type DeleteUserInput = TypeOf<typeof deleteUserSchema>;
 
-export const updateUserSchema = z.object({
+export const updateProfileSchema = z.object({
   body: z.object({
     email: z
       .string({
@@ -79,4 +79,4 @@ export const updateUserSchema = z.object({
   }),
 });
 
-export type UpdateUserSchemaType = TypeOf<typeof updateUserSchema>;
+export type UpdateProfileSchemaType = TypeOf<typeof updateProfileSchema>;
