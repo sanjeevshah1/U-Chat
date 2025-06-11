@@ -1,7 +1,7 @@
 import { Router } from "express";
 import requireUser from "../middlewares/requireUser";
 import {
-  AcceptContactRequestHandlerSchema,
+  HandleContactRequestHandlerSchema,
   AddContactHandlerSchema,
 } from "../schema/contact.schema";
 import {
@@ -9,10 +9,13 @@ import {
   getAllContactsHandler,
   addContactHandler,
   deleteContactsHandler,
-  acceptContactRequestHandler,
+  HandleContactRequestHandler,
+  showRequestsHandler,
 } from "../controllers/contact.controller";
 import validateResource from "../middlewares/validateResource";
+
 const contactRoute = Router();
+
 contactRoute.get("/", requireUser, getContactsHandler);
 contactRoute.get("/all", getAllContactsHandler);
 contactRoute.delete("/delete", requireUser, deleteContactsHandler);
@@ -23,9 +26,12 @@ contactRoute.post(
   addContactHandler,
 );
 contactRoute.patch(
-  "/accept/:id",
+  "/requests/:requestId/:action",
   requireUser,
-  validateResource(AcceptContactRequestHandlerSchema),
-  acceptContactRequestHandler,
+  validateResource(HandleContactRequestHandlerSchema),
+  HandleContactRequestHandler,
 );
+
+contactRoute.get("/requests", requireUser, showRequestsHandler);
+
 export default contactRoute;

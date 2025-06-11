@@ -54,16 +54,6 @@ export type DeleteUserInput = TypeOf<typeof deleteUserSchema>;
 
 export const updateProfileSchema = z.object({
   body: z.object({
-    email: z
-      .string({
-        required_error: "Email is required",
-      })
-      .email("Not a valid email"),
-    password: z
-      .string({
-        required_error: "Password is required",
-      })
-      .min(6, "Password must be atleast 6 characters"),
     updates: z
       .object({
         email: z.string().email("Not a valid email").optional(),
@@ -72,6 +62,7 @@ export const updateProfileSchema = z.object({
           .min(6, "Password must be atleast 6 characters")
           .optional(),
         name: z.string().optional(),
+        bio: z.string().optional(),
       })
       .refine((data) => Object.keys(data).length > 0, {
         message: "Atleast one update should be provided.",
@@ -80,3 +71,10 @@ export const updateProfileSchema = z.object({
 });
 
 export type UpdateProfileSchemaType = TypeOf<typeof updateProfileSchema>;
+
+export const SearchUserSchema = z.object({
+  query: z.object({
+    q: z.string().min(1, "Query is required"),
+  }),
+});
+export type SearchUserInput = TypeOf<typeof SearchUserSchema>;

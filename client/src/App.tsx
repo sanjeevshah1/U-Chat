@@ -1,35 +1,67 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from "react";
+import "./App.css";
+import Navbar from "./Components/Navbar";
+import Homepage from "./Pages/Homepage";
+import { Toaster } from "react-hot-toast";
+import Login from "./Pages/Login";
+import Signup from "./Pages/Signup";
+import Settings from "./Pages/Settings";
+import Profile from "./Pages/Profile";
+import { Routes, Route } from "react-router-dom";
+import { useAuthStore } from "./store/useAuthStore";
+import AuthRequired from "./Components/AuthRequired";
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  const { isLoggedIn } = useAuthStore();
+  console.log("The value of log is", isLoggedIn);
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={isLoggedIn ? <Homepage /> : <Login />} />
+        <Route
+          path="/signup"
+          element={!isLoggedIn ? <Signup /> : <Homepage />}
+        />
+        <Route path="/login" element={!isLoggedIn ? <Login /> : <Homepage />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route element={<AuthRequired />}>
+          <Route path="/profile" element={<Profile />} />
+        </Route>
+      </Routes>
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+        gutter={8}
+        containerClassName=""
+        containerStyle={{}}
+        toastOptions={{
+          // Define default options
+          className: "mx-auto",
+          duration: 4000,
+          style: {
+            background: "#363636",
+            color: "#fff",
+          },
+          // Default options for specific types
+          success: {
+            duration: 3000,
+            style: {
+              background: "#22c55e",
+              color: "#fff",
+            },
+          },
+          error: {
+            duration: 4000,
+            style: {
+              background: "#ef4444",
+              color: "#fff",
+            },
+          },
+        }}
+      />
     </>
-  )
+  );
 }
 
-export default App
+export default App;

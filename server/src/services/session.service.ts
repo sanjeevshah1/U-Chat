@@ -26,7 +26,6 @@ export async function updateSession(
   query: FilterQuery<SessionDocument>,
   update: UpdateQuery<SessionDocument>,
 ) {
-  console.log("updateSession service executing");
   try {
     const updated = await Session.updateOne(query, update);
     return updated;

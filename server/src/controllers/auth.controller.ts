@@ -1,10 +1,12 @@
 import { Request, Response } from "express";
+import { searchUsers } from "../services/contacts.service";
 import mongoose from "mongoose";
 import { get } from "lodash";
 import {
   SignUpSchemaType,
   LoginSchemaType,
   UpdateProfileSchemaType,
+  SearchUserInput,
 } from "../schema/user.schema";
 import {
   createUser,
@@ -138,7 +140,6 @@ export const loginHandler = async (
 };
 
 export const logoutHandler = async (req: Request, res: Response) => {
-  console.log(req.cookies);
   const refreshToken = req.cookies.refreshToken;
   if (!refreshToken) res.status(400).json({ message: "No token provided" });
   else {
@@ -147,7 +148,6 @@ export const logoutHandler = async (req: Request, res: Response) => {
       const ttl = decoded.exp - Math.floor(Date.now() / 1000);
 
       await redis.set(`bl:${refreshToken}`, "1", "EX", ttl); // auto-expire when token expires
-      console.log();
       res.clearCookie("refreshToken");
       res.status(200).json({ message: "Logged out and token blacklisted" });
     } catch (error) {
@@ -187,7 +187,9 @@ export const updateProfileHandler = async (
   res: Response,
 ) => {
   try {
-    const user = await updateUser(req.body);
+    const id = res.locals.user._id;
+    const user = await updateUser({ id, updates: req.body.updates });
+    console.log("the update is running");
     res.status(200).json({
       success: true,
       message: "Profile Updated Succesfully",
@@ -246,6 +248,25 @@ export const updateProfilePictureHandler = async (
     res.status(500).json({
       success: false,
       message: error instanceof Error ? error.message : "Something went wrong",
+    });
+  }
+};
+export const searchUserHandler = async (
+  req: Request<object, object, object, SearchUserInput["query"]>,
+  res: Response,
+) => {
+  try {
+    const { q } = req.query;
+    const searchedUsers = await searchUsers(q);
+    res.status(200).json({
+      success: true,
+      message: "Request accepted",
+      users: searchedUsers,
+    });
+  } catch (error: unknown) {
+    res.status(500).json({
+      success: false,
+      message: error instanceof Error ? error.message : "Internal server error",
     });
   }
 };

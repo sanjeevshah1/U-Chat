@@ -8,24 +8,15 @@ const userSchema = new Schema(
     fullname: { type: String, required: true },
     password: { type: String, required: true, minLength: 3 },
     profilePicture: { type: String, default: "" },
+    coverPicture: { type: String, default: "" },
+    bio: { type: String, default: "" },
+    isOnline: { type: Boolean, default: false },
+    lastSeen: { type: Date, default: Date.now },
   },
   {
     timestamps: true,
   },
 );
-
-// export interface UserSchemaType {
-//   email: string;
-//   fullname: string;
-//   password: string;
-//   profilePicture: string | undefined;
-// }
-
-// export interface UserDocument extends UserSchemaType, Document {
-//   createdAt: Date;
-//   modifiedAt: Date;
-//   comparePassword(candidatePassword: string): Promise<boolean>;
-// }
 
 userSchema.pre<UserDocument>("save", async function (next) {
   const user = this as UserDocument;

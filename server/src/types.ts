@@ -9,6 +9,9 @@ export interface UserInput {
 export interface UserDocument extends UserInput, mongoose.Document {
   createdAt: Date;
   updatedAt: Date;
+  bio: string;
+  isOnline: boolean;
+  lastSeen: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 

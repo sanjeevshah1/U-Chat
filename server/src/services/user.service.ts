@@ -4,7 +4,7 @@ import { UserDocument, UserWithoutPassword } from "../types";
 import User from "../models/user.model";
 import bcrypt from "bcrypt";
 import config from "config";
-import { UpdateUserSchemaType } from "../schema/user.schema";
+import { UpdateProfileSchemaType } from "../schema/user.schema";
 export const createUser = async (input: {
   email: string;
   fullname: string;
@@ -59,27 +59,24 @@ export async function validatePassword({
   }
 }
 
-export const updateUser = async (body: UpdateUserSchemaType["body"]) => {
+export const updateUser = async ({
+  id,
+  updates,
+}: {
+  id: string;
+  updates: UpdateProfileSchemaType["body"]["updates"];
+}) => {
   try {
-    const user = await User.findOne({ email: body.email });
-    if (!user) throw new Error("User not found");
-
-    const isMatch = await user.comparePassword(body.password);
-    if (!isMatch) throw new Error("Password does not match");
-
-    if (body.updates.password) {
-      const salt = await bcrypt.genSalt(config.get<number>("saltWorkFactor"));
-      const hash = bcrypt.hashSync(body.updates.password, salt);
-      body.updates.password = hash;
+    if (!updates) {
+      throw new Error("No updates provided");
     }
-    // if (body.updates.profilePicture) {
-    //   const uploadResponse = await cloudinary.uploader.upload(profilePicture);
-    // }
+    if (updates.password) {
+      const salt = await bcrypt.genSalt(config.get<number>("saltWorkFactor"));
+      const hash = bcrypt.hashSync(updates.password, salt);
+      updates.password = hash;
+    }
 
-    const updatedUser = await User.updateOne(
-      { email: body.email },
-      body.updates,
-    );
+    const updatedUser = await User.updateOne({ _id: id }, updates);
     return updatedUser;
   } catch (error: unknown) {
     throw new Error(
