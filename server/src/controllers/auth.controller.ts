@@ -129,7 +129,12 @@ export const loginHandler = async (
 
       res
         .status(200)
-        .json({ success: true, message: "logged in succesfully", accessToken });
+        .json({
+          success: true,
+          message: "logged in succesfully",
+          accessToken,
+          userId: id,
+        });
     }
   } catch (error: unknown) {
     res.status(500).json({

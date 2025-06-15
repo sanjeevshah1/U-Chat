@@ -38,7 +38,6 @@ export async function updateSession(
   }
 }
 export async function findSessions(query: FilterQuery<SessionDocument>) {
-  console.log("findSessions service executing");
   try {
     const sessions = await Session.find(query).lean();
     return sessions;

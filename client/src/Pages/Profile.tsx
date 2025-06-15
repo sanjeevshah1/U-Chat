@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import api from "../utils/axios";
 import { toast } from "react-hot-toast";
+import axios from "axios";
 import {
   Camera,
   Edit2,
@@ -49,9 +50,12 @@ const Profile = () => {
       console.log("Profile response:", response.data);
       setProfile(response.data.profile);
       setEditedBio(response.data.profile.bio || "");
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || "Failed to load profile";
-      toast.error(errorMessage);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message || "Failed to load profile");
+      } else {
+        toast.error("An unexpected error occurred");
+      }
       setProfile(null);
     } finally {
       setIsLoading(false);
@@ -67,22 +71,29 @@ const Profile = () => {
     setIsSaving(true);
     try {
       const response = await api.patch("/auth/profile", {
-        updates: { bio: editedBio.trim() }
+        updates: { bio: editedBio.trim() },
       });
-      
+
       // Update profile state with new data
       if (response.data.profile) {
         setProfile(response.data.profile);
       } else {
         // If profile not in response, update the bio manually
-        setProfile(prev => prev ? { ...prev, bio: editedBio.trim() } : null);
+        setProfile((prev) =>
+          prev ? { ...prev, bio: editedBio.trim() } : null
+        );
       }
-      
+
       setIsEditing(false);
       toast.success("Profile updated successfully");
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || "Failed to update profile";
-      toast.error(errorMessage);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const errorMessage =
+          error.response?.data?.message || "Failed to update profile";
+        toast.error(errorMessage);
+      } else {
+        toast.error("An unexpected error occurred");
+      }
       // Reset edited bio to original value on error
       setEditedBio(profile?.bio || "");
     } finally {
@@ -109,21 +120,32 @@ const Profile = () => {
     formData.append("image", file);
 
     try {
-      const response = await api.patch(`/auth/profile/${type}-picture`, formData, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
-      
+      const response = await api.patch(
+        `/auth/profile/${type}-picture`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
       if (response.data.profile) {
         setProfile(response.data.profile);
       } else {
         // If no profile in response, refetch to get updated data
         await fetchProfile();
       }
-      
-      toast.success(`${type === "profile" ? "Profile" : "Cover"} picture updated`);
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || "Failed to update picture";
-      toast.error(errorMessage);
+
+      toast.success(
+        `${type === "profile" ? "Profile" : "Cover"} picture updated`
+      );
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const errorMessage =
+          error.response?.data?.message || "Failed to update picture";
+        toast.error(errorMessage);
+      } else {
+        toast.error("An unexpected error occurred");
+      }
     }
   };
 
@@ -145,9 +167,10 @@ const Profile = () => {
       if (diffMins < 60) return `${diffMins} minutes ago`;
       if (diffHours < 24) return `${diffHours} hours ago`;
       if (diffDays < 7) return `${diffDays} days ago`;
-      
+
       return date.toLocaleDateString();
     } catch (error) {
+      console.log(error);
       return "Unknown";
     }
   };
@@ -167,7 +190,9 @@ const Profile = () => {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-5rem)]">
         <div className="text-center">
-          <p className="text-muted-foreground mb-4">Please log in to view your profile</p>
+          <p className="text-muted-foreground mb-4">
+            Please log in to view your profile
+          </p>
         </div>
       </div>
     );
@@ -196,7 +221,9 @@ const Profile = () => {
         <div
           className="w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-cyan-600"
           style={{
-            backgroundImage: profile.coverPicture ? `url(${profile.coverPicture})` : "none",
+            backgroundImage: profile.coverPicture
+              ? `url(${profile.coverPicture})`
+              : "none",
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
@@ -216,7 +243,7 @@ const Profile = () => {
                 if (file) {
                   handleImageUpload("cover", file);
                   // Reset the file input
-                  e.target.value = '';
+                  e.target.value = "";
                 }
               }}
             />
@@ -256,7 +283,7 @@ const Profile = () => {
                 if (file) {
                   handleImageUpload("profile", file);
                   // Reset the file input
-                  e.target.value = '';
+                  e.target.value = "";
                 }
               }}
             />
@@ -352,10 +379,11 @@ const Profile = () => {
 
           {/* Member Since */}
           <div className="text-sm text-muted-foreground">
-            Member since {new Date(profile.createdAt).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
+            Member since{" "}
+            {new Date(profile.createdAt).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
             })}
           </div>
         </div>

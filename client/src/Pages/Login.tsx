@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import AuthImagePattern from "../components/AuthImagePattern";
+// import AuthImagePattern from "../components/AuthImagePattern";
+import AuthImagePattern from "../Components/AuthImagePattern";
 import { useAuthStore } from "../store/useAuthStore";
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
@@ -27,8 +28,8 @@ const LoginPage = () => {
     setIsLogging(true);
     console.log(formData);
     try {
-      const data = await api.post("/auth/login", formData);
-      setAccessToken(data.data.accessToken);
+      const response = await api.post("/auth/login", formData);
+      setAccessToken(response.data.accessToken, response.data.userId);
       toast.success("Logged in succesfully");
     } catch (error) {
       console.log("Error logging in:", error);

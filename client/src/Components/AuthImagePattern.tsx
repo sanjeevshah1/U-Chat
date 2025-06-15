@@ -1,11 +1,4 @@
-import {
-  MessageSquare,
-  Users,
-  Heart,
-  Zap,
-  Sparkles,
-  Globe,
-} from "lucide-react";
+import { MessageSquare, Users, Zap } from "lucide-react";
 
 interface AuthImagePatternProps {
   title: string;

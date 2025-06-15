@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect } from "react";
 import "./App.css";
 import Navbar from "./Components/Navbar";
 import Homepage from "./Pages/Homepage";
@@ -10,9 +10,19 @@ import Profile from "./Pages/Profile";
 import { Routes, Route } from "react-router-dom";
 import { useAuthStore } from "./store/useAuthStore";
 import AuthRequired from "./Components/AuthRequired";
+import useChatStore from "./store/useChatStore";
 
 function App() {
   const { isLoggedIn } = useAuthStore();
+  const { connect, disconnect } = useChatStore();
+  useEffect(() => {
+    if (isLoggedIn) {
+      connect();
+      return () => disconnect();
+    } else {
+      disconnect();
+    }
+  }, [isLoggedIn]);
   console.log("The value of log is", isLoggedIn);
   return (
     <>

@@ -2,6 +2,7 @@ import { Express } from "express";
 import authRoutes from "../routes/auth.routes";
 import contactRoute from "../routes/contact.route";
 import User from "../models/user.model";
+import messageRoutes from "../routes/message.routes";
 
 // import messageRoutes from "../routes/message.routes";
 const routes = (app: Express) => {
@@ -18,7 +19,9 @@ const routes = (app: Express) => {
   //Auth Routes
   app.use("/api/auth", authRoutes);
 
-  //Messages Routes
   app.use("/api/contacts", contactRoute);
+
+  //Messages Routes
+  app.use("/api/messages", messageRoutes);
 };
 export default routes;

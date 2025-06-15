@@ -10,14 +10,15 @@ import {
   Users,
   Menu,
   X,
-  Bell,
 } from "lucide-react";
 import FriendRequestsModal from "./FriendRequestsModal";
 import AddContactModal from "./AddContactModlal";
 import useRequestStore from "../store/useRequestStore";
+import useChatStore from "../store/useChatStore";
 
 const Navbar = () => {
   const { isLoggedIn, setAccessToken } = useAuthStore();
+  const { disconnect } = useChatStore();
 
   // State management
   const [showAddFriend, setShowAddFriend] = useState(false);
@@ -31,13 +32,13 @@ const Navbar = () => {
   const handleLogout = () => {
     setAccessToken(null);
     setIsMobileMenuOpen(false);
+    disconnect();
   };
 
   const NavButton = ({
     onClick,
     icon: Icon,
     label,
-    variant = "default",
     badge = null,
   }: {
     onClick: () => void;
@@ -64,7 +65,17 @@ const Navbar = () => {
     </button>
   );
 
-  const NavLink = ({ to, icon: Icon, label, variant = "default" }) => (
+  const NavLink = ({
+    to,
+    icon: Icon,
+    label,
+    variant = "default",
+  }: {
+    to: string;
+    icon: React.ElementType;
+    label: string;
+    variant?: "default" | "primary" | "danger";
+  }) => (
     <Link
       to={to}
       className={`

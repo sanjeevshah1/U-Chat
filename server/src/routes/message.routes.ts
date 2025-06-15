@@ -18,7 +18,7 @@ messageRoutes.get(
   getMessagesHandler,
 );
 
-messageRoutes.get(
+messageRoutes.post(
   "/send/:id",
   requireUser,
   validateResource(SendMessageHandlerSchema),

@@ -18,7 +18,23 @@ export const SendMessageHandlerSchema = z.object({
   body: z
     .object({
       text: z.string().optional(),
-      image: z.string().url().optional(),
+      image: z
+        .string()
+        .optional()
+        .refine(
+          (val) => {
+            if (!val) return true; // Optional field
+            // Allow both URLs and base64 data URLs
+            return (
+              val.startsWith("http://") ||
+              val.startsWith("https://") ||
+              val.startsWith("data:image/")
+            );
+          },
+          {
+            message: "Image must be a valid URL or base64 data URL",
+          },
+        ),
     })
     .strict()
     .refine((data) => data.text || data.image, {

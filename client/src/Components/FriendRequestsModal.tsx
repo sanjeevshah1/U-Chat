@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { X, User, Mail, Check, UserX, Loader2, Users } from "lucide-react";
 import api from "../utils/axios";
 import { toast } from "react-hot-toast";
 import useRequestStore from "../store/useRequestStore";
+import axios from "axios";
+import useChatStore from "../store/useChatStore";
 export interface FriendRequest {
   _id: string;
   user: {
@@ -27,7 +29,9 @@ interface FriendRequestsModalProps {
 
 const FriendRequestsModal = ({ isOpen, onClose }: FriendRequestsModalProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { friendRequests, setFriendRequests } = useRequestStore();
+  const { socket } = useChatStore();
+  const { friendRequests, setFriendRequests, fetchFriendRequests } =
+    useRequestStore();
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [actionType, setActionType] = useState<"accept" | "reject" | null>(
     null
@@ -36,26 +40,35 @@ const FriendRequestsModal = ({ isOpen, onClose }: FriendRequestsModalProps) => {
   // Fetch friend requests when modal opens
   useEffect(() => {
     if (isOpen) {
-      fetchFriendRequests();
+      setIsLoading(true);
+      fetchFriendRequests().finally(() => setIsLoading(false));
     }
   }, [isOpen]);
 
-  const fetchFriendRequests = async () => {
-    console.log("the fetch is running");
+  socket?.on("friendRequestReceived", () => {
     setIsLoading(true);
-    try {
-      const response =
-        await api.get<FriendRequestsResponse>("/contacts/requests");
-      console.log(response.data.requests);
-      setFriendRequests(response.data.requests || []);
-    } catch (error: any) {
-      console.error("Error fetching friend requests:", error);
-      toast.error("Failed to load friend requests");
-      setFriendRequests([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    fetchFriendRequests().finally(() => setIsLoading(false));
+  });
+  // const fetchFriendRequests = async () => {
+  //   console.log("the fetch is running");
+  //   setIsLoading(true);
+  //   try {
+  //     const response =
+  //       await api.get<FriendRequestsResponse>("/contacts/requests");
+  //     console.log(response.data.requests);
+  //     setFriendRequests(response.data.requests || []);
+  //   } catch (error) {
+  //     if (axios.isAxiosError(error)) {
+  //       toast.error(error.response?.data?.message);
+  //     } else {
+  //       console.error("Error fetching friend requests:", error);
+  //       toast.error("Failed to load friend requests");
+  //     }
+  //     setFriendRequests([]);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   const handleFriendRequest = async (
     requestId: string,
@@ -79,11 +92,13 @@ const FriendRequestsModal = ({ isOpen, onClose }: FriendRequestsModalProps) => {
           ? "Friend request accepted!"
           : "Friend request rejected"
       );
-    } catch (error: any) {
-      console.error(`Error ${action}ing friend request:`, error);
-      toast.error(
-        error.response?.data?.message || `Failed to ${action} friend request`
-      );
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message);
+      } else {
+        console.error(`Error ${action}ing friend request:`, error);
+        toast.error(`Failed to ${action} friend request`);
+      }
     } finally {
       setProcessingId(null);
       setActionType(null);

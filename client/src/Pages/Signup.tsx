@@ -1,7 +1,8 @@
-import React, { useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useAuthStore } from "../store/useAuthStore";
-import AuthImagePattern from "../components/AuthImagePattern";
+import AuthImagePattern from "../Components/AuthImagePattern";
 import api from "../utils/axios";
+import { z } from "zod";
 import {
   Eye,
   EyeOff,
@@ -15,6 +16,31 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
+const passwordValidation = z
+  .string()
+  .min(8, "Password must be at least 8 characters")
+  .max(32, "Password must be at most 32 characters")
+  .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+  .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+  .regex(/[0-9]/, "Password must contain at least one number")
+  .regex(
+    /[^a-zA-Z0-9]/,
+    "Password must contain at least one special character"
+  );
+
+const signUpSchema = z
+  .object({
+    fullname: z
+      .string()
+      .min(3, { message: "Full name must be at least 3 characters long" }),
+    email: z.string().email("Must be a valid email"),
+    password: passwordValidation,
+    confirmPassword: passwordValidation,
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -36,46 +62,37 @@ const SignUpPage = () => {
     confirmPassword: "",
   });
 
-  const validateForm = () => {
-    if (!formData.fullname.trim()) {
-      toast.error("Full name is required");
-      return false;
-    }
-    if (!formData.email.trim()) {
-      toast.error("Email is required");
-      return false;
-    }
-    if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      toast.error("Invalid email format");
-      return false;
-    }
-    if (!formData.password) {
-      toast.error("Password is required");
-      return false;
-    }
-    if (formData.password.length < 6) {
-      toast.error("Password must be at least 6 characters");
-      return false;
-    }
-    if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match");
-      return false;
-    }
-    return true;
-  };
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    const isValid = validateForm();
-    if (!isValid) return;
+    // Validate formData with Zod schema
+    const result = signUpSchema.safeParse(formData);
 
+    if (!result.success) {
+      // Extract errors from ZodError and display or handle them
+      const formattedError = result.error.issues.map((err) => {
+        const cleanedPath =
+          err.path[0] === "body"
+            ? err.path.slice(1).join(".")
+            : err.path.join(".");
+        return {
+          path: cleanedPath,
+          message: err.message,
+        };
+      });
+
+      // You can log or display these errors as needed
+      console.log(formattedError);
+      formattedError.forEach(({ message }) => toast.error(message));
+
+      return; // Stop here if validation failed
+    }
+
+    // If validation passes, proceed with signup request
     setIsSigning(true);
 
     try {
-      const response = await api.post('/auth/signup',
-        formData
-      );
+      const response = await api.post("/auth/signup", formData);
 
       if (response.data.success) {
         toast.success("Account created successfully!");
@@ -85,32 +102,45 @@ const SignUpPage = () => {
           password: "",
           confirmPassword: "",
         });
-        setAccessToken(response.data.accessToken);
+        setAccessToken(response.data.accessToken, response.data.userId);
       } else {
         toast.error(response.data.message || "Signup failed");
       }
-    } catch (error: any) {
-      console.error('Signup error:', error);
-      
-      if (error.response?.data?.errors) {
-        // Handle Zod validation errors
-        const validationErrors = error.response.data.errors;
-        const errorMessages = validationErrors.map((err: { path: string; message: string }) => {
-          return `${err.message}`;
-        });
-        
-        // Show each validation error with a delay
-        errorMessages.forEach((message: string, index: number) => {
-          setTimeout(() => {
-            toast.error(message);
-          }, index * 100); // 100ms delay between each toast
-        });
+    } catch (error: unknown) {
+      console.error("Signup error:", error);
+
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "response" in error &&
+        typeof (error as { response: unknown }).response === "object"
+      ) {
+        const safeError = error as {
+          response: {
+            data?: {
+              errors?: { path: string; message: string }[];
+              message?: string;
+            };
+          };
+          message?: string;
+        };
+
+        const validationErrors = safeError.response?.data?.errors;
+        if (validationErrors && Array.isArray(validationErrors)) {
+          validationErrors.forEach(({ message }, index) => {
+            setTimeout(() => {
+              toast.error(message);
+            }, index * 100);
+          });
+        } else {
+          toast.error(
+            safeError.response?.data?.message ||
+              safeError.message ||
+              "Something went wrong"
+          );
+        }
       } else {
-        // Handle other types of errors
-        const errorMessage = error.response?.data?.message || 
-                           error.message || 
-                           "Something went wrong";
-        toast.error(errorMessage);
+        toast.error("An unexpected error occurred.");
       }
     } finally {
       setIsSigning(false);
@@ -127,7 +157,6 @@ const SignUpPage = () => {
   };
 
   const passwordStrength = getPasswordStrength(formData.password);
-
 
   return (
     <div className="grid md:grid-cols-2  h-[calc(100vh-5rem)] border-t-1 border-white/20 ">

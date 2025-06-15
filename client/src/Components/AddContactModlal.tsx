@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Search, X, UserPlus, Mail, User, Loader2 } from "lucide-react";
 import api from "../utils/axios";
 import { toast } from "react-hot-toast";
+import axios from "axios";
 
 interface SearchUser {
   _id: string;
@@ -41,8 +42,13 @@ const AddContactModal = ({ isOpen, onClose }: FriendRequestModalProps) => {
       );
       console.log(response.data.users);
       setSearchResults(response.data.users || []);
-    } catch (error: any) {
-      console.error("Error searching users:", error);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message);
+      } else {
+        console.error("Error searching users:", error);
+        toast.error("Failed to search users");
+      }
       setSearchResults([]);
     } finally {
       setIsSearching(false);
@@ -56,11 +62,16 @@ const AddContactModal = ({ isOpen, onClose }: FriendRequestModalProps) => {
       await api.post("/contacts/add", { recipientId: userId });
       setSentRequests((prev) => new Set([...prev, userId]));
       toast.success("Friend request sent successfully!");
-    } catch (error: any) {
-      console.error("Error sending friend request:", error);
-      toast.error(
-        error.response?.data?.message || "Failed to send friend request"
-      );
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error("Error sending friend request:", error);
+        toast.error(
+          error.response?.data?.message || "Failed to send friend request"
+        );
+      } else {
+        console.error("Error sending friend request:", error);
+        toast.error("Failed to send friend request");
+      }
     } finally {
       setSendingTo(null);
     }

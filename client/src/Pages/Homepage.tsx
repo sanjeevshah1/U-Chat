@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Contact, Menu, X } from "lucide-react";
 import Sidebar from "../Components/Sidebar";
-
+import Chat from "../Components/Chat";
+import useChatStore from "../store/useChatStore";
 export type FilterOptions = "online" | "all";
 
 export interface sidebarProps {
@@ -13,6 +14,7 @@ export interface sidebarProps {
 const Homepage = () => {
   const [filter, setFilter] = useState<FilterOptions>("all");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { selectedChat } = useChatStore();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFilter(event.target.checked ? "online" : "all");
@@ -34,7 +36,7 @@ const Homepage = () => {
           {/* Mobile menu button */}
           <button
             onClick={toggleSidebar}
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            className="md:p-2 border-2 border-red-900 rounded-lg text-black hover:bg-gray-100 transition-colors"
           >
             <Menu className="w-5 h-5" />
           </button>
@@ -119,19 +121,23 @@ const Homepage = () => {
 
         {/* Main Content Area */}
         <main className="flex-1 flex items-center justify-center bg-white md:border-l border-gray-200">
-          <div className="text-center text-gray-500">
-            <Contact className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-            <h3 className="text-lg font-medium mb-2">Select a contact</h3>
-            <p className="text-sm">Choose a contact to start chatting</p>
+          {selectedChat ? (
+            <Chat />
+          ) : (
+            <div className="text-center text-gray-500">
+              <Contact className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+              <h3 className="text-lg font-medium mb-2">Select a contact</h3>
+              <p className="text-sm">Choose a contact to start chatting</p>
 
-            {/* Mobile: Show contacts button */}
-            <button
-              onClick={toggleSidebar}
-              className="md:hidden mt-6 bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors"
-            >
-              View Contacts
-            </button>
-          </div>
+              {/* Mobile: Show contacts button */}
+              <button
+                onClick={toggleSidebar}
+                className="md:hidden mt-6 bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+              >
+                View Contacts
+              </button>
+            </div>
+          )}
         </main>
       </div>
     </div>

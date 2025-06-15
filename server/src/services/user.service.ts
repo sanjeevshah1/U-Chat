@@ -61,7 +61,7 @@ export async function validatePassword({
 
 export const updateUser = async ({
   id,
-  updates,
+  updates
 }: {
   id: string;
   updates: UpdateProfileSchemaType["body"]["updates"];

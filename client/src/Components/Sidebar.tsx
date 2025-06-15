@@ -1,17 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { sidebarProps } from "../Pages/Homepage";
-import { Search, User, UserPlus } from "lucide-react";
+import { useEffect, useState } from "react";
+import type { sidebarProps } from "../Pages/Homepage";
+import { Search, User } from "lucide-react";
 import api from "../utils/axios";
 import AddContactModal from "./AddContactModlal";
 import useRequestStore from "../store/useRequestStore";
-
+import axios from "axios";
+import useChatStore from "../store/useChatStore";
+import type { SelectContactType } from "../store/useChatStore";
 export type ContactResponse = {
   contacts: Contact[];
 };
 
 export type Contact = {
   _id: string;
-  status: "accepted" | "pending" | "rejected"; // include others if needed
+  status: "accepted" | "pending" | "rejected";
   createdAt: string;
   friend: {
     _id: string;
@@ -22,19 +24,24 @@ export type Contact = {
   };
 };
 
-const Sidebar = ({ filter, isOpen, onClose }: sidebarProps) => {
+const Sidebar = ({ filter, onClose }: sidebarProps) => {
   const [error, setError] = useState<string | null>(null);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedContact, setSelectedContact] = useState<string | null>(null);
+  const { selectedChat, setSelectedChat } = useChatStore();
+  // const [selectedContact, setSelectedContact] = useState<string | null>(null);
   const [showFriendModal, setShowFriendModal] = useState(false);
   const { friendRequests } = useRequestStore();
   const fetchContacts = async () => {
     try {
       const response = await api.get<ContactResponse>("/contacts");
       setContacts(response.data.contacts);
-    } catch (error: any) {
-      setError(error.message || "Error Fetching Contacts");
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        setError(error.response?.data?.message);
+      } else {
+        setError("Error Fetching Contacts");
+      }
     }
   };
 
@@ -53,8 +60,12 @@ const Sidebar = ({ filter, isOpen, onClose }: sidebarProps) => {
     return matchesFilter && matchesSearch;
   });
 
-  const handleContactClick = (contactId: string) => {
-    setSelectedContact(contactId);
+  const handleContactClick = (contact: SelectContactType) => {
+    if (!selectedChat) {
+      setSelectedChat(contact);
+    } else {
+      setSelectedChat(undefined);
+    }
     // Close sidebar on mobile when contact is selected
     if (window.innerWidth < 1024) {
       onClose();
@@ -105,9 +116,16 @@ const Sidebar = ({ filter, isOpen, onClose }: sidebarProps) => {
               {filteredContacts.map(({ _id, friend }) => (
                 <div
                   key={_id}
-                  onClick={() => handleContactClick(_id)}
+                  onClick={() =>
+                    handleContactClick({
+                      id: friend._id,
+                      fullname: friend.fullname,
+                      profilePicture: friend.profilePicture,
+                      isOnline: friend.isOnline,
+                    })
+                  }
                   className={`flex cursor-pointer items-center gap-3 p-4 hover:bg-gray-50 transition-colors duration-150 ${
-                    selectedContact === _id
+                    selectedChat?.id === _id
                       ? "bg-purple-50 border-r-2 border-purple-500"
                       : ""
                   }`}
