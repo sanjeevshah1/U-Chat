@@ -30,7 +30,7 @@ const Navbar = () => {
   const pendingRequestsCount = friendRequests.length; // This should come from your auth store or API
 
   const handleLogout = () => {
-    setAccessToken(null);
+    setAccessToken(null, null);
     setIsMobileMenuOpen(false);
     disconnect();
   };

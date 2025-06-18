@@ -3,6 +3,7 @@ import Message from "../models/message.model";
 import cloudinary from "../utils/cloudinary.utils";
 import { getReceiverSocketId, io } from "../utils/socket";
 import { Types } from "mongoose";
+
 export const getMessagesHandler = async (req: Request, res: Response) => {
   try {
     const { id: friendId } = req.params;

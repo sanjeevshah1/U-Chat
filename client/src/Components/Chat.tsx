@@ -8,22 +8,36 @@ import {
   Check,
   CheckCheck,
 } from "lucide-react";
-
+import { convertToBase64 } from "../utils/utils";
 import useChatStore from "../store/useChatStore";
 import axios from "axios";
 import toast from "react-hot-toast";
 import api from "../utils/axios";
+import type { Message } from "./../types";
 
-interface Message {
-  _id?: string;
-  senderId: string;
-  receiverId: string;
-  text: string;
-  image?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  status?: "sending" | "sent" | "delivered" | "read";
-}
+// Animated Typing Indicator Component
+const TypingIndicator = () => {
+  return (
+    <div className="flex justify-start mb-4">
+      <div className="max-w-xs lg:max-w-md px-4 py-3 rounded-2xl bg-white text-gray-900 border border-gray-200 rounded-bl-md shadow-sm">
+        <div className="flex items-center space-x-1">
+          <span className="text-sm text-gray-500 mr-2">Typing</span>
+          <div className="flex space-x-1">
+            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+            <div
+              className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+              style={{ animationDelay: "0.1s" }}
+            ></div>
+            <div
+              className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+              style={{ animationDelay: "0.2s" }}
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const Chat = () => {
   const { socket, selectedChat } = useChatStore();
@@ -39,16 +53,6 @@ const Chat = () => {
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const currentUserId = localStorage.getItem("userId");
-
-  // Convert file to base64
-  const convertToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = (error) => reject(error);
-    });
-  };
 
   // Auto-resize textarea
   const adjustTextareaHeight = useCallback(() => {
@@ -66,7 +70,7 @@ const Chat = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, scrollToBottom]);
+  }, [messages, isTyping, scrollToBottom]); // Added isTyping to dependencies
 
   // Fetch initial messages when chat is selected
   useEffect(() => {
@@ -107,7 +111,6 @@ const Chat = () => {
   useEffect(() => {
     if (!socket) return;
 
-    // Updated to match your backend socket event name
     const handleIncomingMessage = (message: Message) => {
       setMessages((prev) => {
         // Prevent duplicate messages
@@ -134,9 +137,6 @@ const Chat = () => {
       if (data.userId === selectedChat?.id) {
         setIsTyping(data.isTyping);
       }
-      // if (data.userId !== currentUserId) {
-      //   setIsTyping(data.isTyping);
-      // }
     };
 
     const handleConnectionError = () => {
@@ -357,7 +357,7 @@ const Chat = () => {
   }
 
   return (
-    <div className="flex flex-col w-full h-full max-h-[calc(100vh-8.1rem)] border-t-4 bg-white">
+    <div className="flex flex-col w-full h-full max-h-[calc(100vh-4.7rem)] border-t-4 bg-white">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white shadow-sm">
         <div className="flex items-center space-x-3">
@@ -382,13 +382,34 @@ const Chat = () => {
               {selectedChat.fullname}
             </h3>
             <p
-              className={`text-sm ${selectedChat.isOnline ? "text-green-500" : "text-gray-500"}`}
+              className={`text-sm transition-colors duration-200 ${
+                isTyping
+                  ? "text-blue-500 font-medium"
+                  : selectedChat.isOnline
+                    ? "text-green-500"
+                    : "text-gray-500"
+              }`}
             >
-              {isTyping
-                ? "Typing..."
-                : selectedChat.isOnline
-                  ? "Online"
-                  : "Offline"}
+              {isTyping ? (
+                <span className="flex items-center">
+                  <span>Typing</span>
+                  <span className="flex ml-1 space-x-0.5">
+                    <span className="w-1 h-1 bg-blue-500 rounded-full animate-bounce"></span>
+                    <span
+                      className="w-1 h-1 bg-blue-500 rounded-full animate-bounce"
+                      style={{ animationDelay: "0.1s" }}
+                    ></span>
+                    <span
+                      className="w-1 h-1 bg-blue-500 rounded-full animate-bounce"
+                      style={{ animationDelay: "0.2s" }}
+                    ></span>
+                  </span>
+                </span>
+              ) : selectedChat.isOnline ? (
+                "Online"
+              ) : (
+                "Offline"
+              )}
             </p>
           </div>
         </div>
@@ -422,45 +443,50 @@ const Chat = () => {
             </p>
           </div>
         ) : (
-          messages.map((message, index) => (
-            <div
-              key={message._id || index}
-              className={`flex ${isSentByMe(message) ? "justify-end" : "justify-start"}`}
-            >
+          <>
+            {messages.map((message, index) => (
               <div
-                className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
-                  isSentByMe(message)
-                    ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-br-md"
-                    : "bg-white text-gray-900 border border-gray-200 rounded-bl-md shadow-sm"
-                }`}
+                key={message._id || index}
+                className={`flex ${isSentByMe(message) ? "justify-end" : "justify-start"}`}
               >
-                {message.image && (
-                  <img
-                    src={message.image}
-                    alt="Shared image"
-                    className="w-full h-auto rounded-lg mb-2 max-w-sm"
-                  />
-                )}
-                {message.text && (
-                  <p className="text-sm leading-relaxed break-words">
-                    {message.text}
-                  </p>
-                )}
                 <div
-                  className={`flex items-center justify-end mt-1 space-x-1 ${
-                    isSentByMe(message) ? "text-blue-100" : "text-gray-500"
+                  className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
+                    isSentByMe(message)
+                      ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-br-md"
+                      : "bg-white text-gray-900 border border-gray-200 rounded-bl-md shadow-sm"
                   }`}
                 >
-                  {message.createdAt && (
-                    <span className="text-xs">
-                      {formatTime(message.createdAt)}
-                    </span>
+                  {message.image && (
+                    <img
+                      src={message.image}
+                      alt="Shared image"
+                      className="w-full h-auto rounded-lg mb-2 max-w-sm"
+                    />
                   )}
-                  {isSentByMe(message) && renderMessageStatus(message.status)}
+                  {message.text && (
+                    <p className="text-sm leading-relaxed break-words">
+                      {message.text}
+                    </p>
+                  )}
+                  <div
+                    className={`flex items-center justify-end mt-1 space-x-1 ${
+                      isSentByMe(message) ? "text-blue-100" : "text-gray-500"
+                    }`}
+                  >
+                    {message.createdAt && (
+                      <span className="text-xs">
+                        {formatTime(message.createdAt)}
+                      </span>
+                    )}
+                    {isSentByMe(message) && renderMessageStatus(message.status)}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
+            ))}
+
+            {/* Animated Typing Indicator */}
+            {isTyping && <TypingIndicator />}
+          </>
         )}
         <div ref={messagesEndRef} />
       </div>
@@ -477,7 +503,7 @@ const Chat = () => {
             />
             <button
               onClick={removeSelectedImage}
-              className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600"
+              className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
             >
               ×
             </button>

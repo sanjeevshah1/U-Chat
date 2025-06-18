@@ -22,7 +22,7 @@ function App() {
     } else {
       disconnect();
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, connect, disconnect]);
   console.log("The value of log is", isLoggedIn);
   return (
     <>
@@ -46,14 +46,12 @@ function App() {
         containerClassName=""
         containerStyle={{}}
         toastOptions={{
-          // Define default options
           className: "mx-auto",
           duration: 4000,
           style: {
             background: "#363636",
             color: "#fff",
           },
-          // Default options for specific types
           success: {
             duration: 3000,
             style: {

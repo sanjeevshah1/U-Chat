@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import type { sidebarProps } from "../Pages/Homepage";
-import { Search, User } from "lucide-react";
+import { Search, User, Contact, X } from "lucide-react";
 import api from "../utils/axios";
 import AddContactModal from "./AddContactModlal";
 import useRequestStore from "../store/useRequestStore";
 import axios from "axios";
 import useChatStore from "../store/useChatStore";
 import type { SelectContactType } from "../store/useChatStore";
+
 export type ContactResponse = {
   contacts: Contact[];
 };
@@ -24,14 +25,24 @@ export type Contact = {
   };
 };
 
-const Sidebar = ({ filter, onClose }: sidebarProps) => {
+interface ExtendedSidebarProps extends sidebarProps {
+  onFilterChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  showCloseButton?: boolean;
+}
+
+const Sidebar = ({
+  filter,
+  onClose,
+  onFilterChange,
+  showCloseButton = false,
+}: ExtendedSidebarProps) => {
   const [error, setError] = useState<string | null>(null);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const { selectedChat, setSelectedChat } = useChatStore();
-  // const [selectedContact, setSelectedContact] = useState<string | null>(null);
   const [showFriendModal, setShowFriendModal] = useState(false);
   const { friendRequests } = useRequestStore();
+
   const fetchContacts = async () => {
     try {
       const response = await api.get<ContactResponse>("/contacts");
@@ -78,7 +89,43 @@ const Sidebar = ({ filter, onClose }: sidebarProps) => {
 
   return (
     <>
-      <aside className="h-full lg:w-80 bg-white flex flex-col lg:border-r border-gray-200">
+      <aside className="h-full w-full bg-white flex flex-col border-r border-gray-200">
+        {/* Sidebar Header */}
+        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+          <div className="flex items-center gap-2">
+            <Contact className="w-6 h-6 text-purple-600" />
+            <h2 className="text-xl font-semibold text-gray-900">Contacts</h2>
+          </div>
+          {showCloseButton && (
+            <button
+              onClick={onClose}
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
+        </div>
+
+        {/* Filter Toggle */}
+        <div className="p-4 border-b border-gray-200">
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id={showCloseButton ? "online-mobile" : "online-desktop"}
+              name={showCloseButton ? "online-mobile" : "online-desktop"}
+              className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+              checked={filter === "online"}
+              onChange={onFilterChange}
+            />
+            <label
+              htmlFor={showCloseButton ? "online-mobile" : "online-desktop"}
+              className="text-sm text-gray-700"
+            >
+              Show only online
+            </label>
+          </div>
+        </div>
+
         {/* Search Bar */}
         <div className="p-4 border-b border-gray-200">
           <div className="relative">
