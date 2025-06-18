@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   Send,
   MoreVertical,
-  Smile,
   Paperclip,
   Phone,
   Video,
@@ -32,7 +31,6 @@ const Chat = () => {
   const [newMessage, setNewMessage] = useState("");
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [isTyping, setIsTyping] = useState(false);
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [connectionError, setConnectionError] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -133,9 +131,12 @@ const Chat = () => {
     };
 
     const handleTyping = (data: { userId: string; isTyping: boolean }) => {
-      if (data.userId !== currentUserId) {
+      if (data.userId === selectedChat?.id) {
         setIsTyping(data.isTyping);
       }
+      // if (data.userId !== currentUserId) {
+      //   setIsTyping(data.isTyping);
+      // }
     };
 
     const handleConnectionError = () => {
@@ -148,7 +149,6 @@ const Chat = () => {
       toast.success("Reconnected!");
     };
 
-    // Updated event name to match your backend
     socket.on("newMessage", handleIncomingMessage);
     socket.on("messageStatus", handleMessageStatus);
     socket.on("typing", handleTyping);
@@ -162,13 +162,13 @@ const Chat = () => {
       socket.off("disconnect", handleConnectionError);
       socket.off("connect", handleReconnect);
     };
-  }, [socket, currentUserId]);
+  }, [socket, currentUserId, selectedChat?.id]);
 
-  // Handle typing indicator
   const handleTypingStart = useCallback(() => {
     if (!socket || !selectedChat?.id) return;
 
     socket.emit("typing", {
+      userId: currentUserId,
       receiverId: selectedChat.id,
       isTyping: true,
     });
@@ -181,13 +181,13 @@ const Chat = () => {
     // Stop typing after 3 seconds of inactivity
     typingTimeoutRef.current = setTimeout(() => {
       socket.emit("typing", {
+        userId: currentUserId,
         receiverId: selectedChat.id,
         isTyping: false,
       });
     }, 3000);
-  }, [socket, selectedChat?.id]);
+  }, [socket, selectedChat?.id, currentUserId]);
 
-  // Send message handler - Updated to use your API
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -224,7 +224,6 @@ const Chat = () => {
     }
 
     try {
-      // Send via your API endpoint
       const response = await api.post(`/messages/send/${selectedChat.id}`, {
         text: messageText,
         image: imageToSend,
@@ -281,14 +280,9 @@ const Chat = () => {
       }
 
       // Check file type
-      const allowedTypes = [
-        "image/jpeg",
-        "image/jpg",
-        "image/png",
-        "image/gif",
-      ];
+      const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
       if (!allowedTypes.includes(file.type)) {
-        toast.error("Only image files are allowed");
+        toast.error(`Only image files are allowed, ${file.type} not allowed`);
         return;
       }
 
@@ -363,7 +357,7 @@ const Chat = () => {
   }
 
   return (
-    <div className="flex flex-col w-full h-full max-h-screen border-t-4 bg-white">
+    <div className="flex flex-col w-full h-full max-h-[calc(100vh-8.1rem)] border-t-4 bg-white">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white shadow-sm">
         <div className="flex items-center space-x-3">
@@ -499,13 +493,6 @@ const Chat = () => {
             >
               <Paperclip className="w-5 h-5" />
             </button>
-            <button
-              type="button"
-              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <Smile className="w-5 h-5" />
-            </button>
           </div>
 
           <div className="flex-1 relative">
@@ -515,7 +502,7 @@ const Chat = () => {
               onChange={handleInputChange}
               onKeyDown={handleKeyPress}
               placeholder="Type a message..."
-              className="w-full p-3 pr-12 border border-gray-300 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              className="w-full p-3 pr-12 text-black border border-gray-300 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               rows={1}
               style={{ minHeight: "44px" }}
             />

@@ -81,14 +81,12 @@ const SignUpPage = () => {
         };
       });
 
-      // You can log or display these errors as needed
       console.log(formattedError);
       formattedError.forEach(({ message }) => toast.error(message));
 
-      return; // Stop here if validation failed
+      return;
     }
 
-    // If validation passes, proceed with signup request
     setIsSigning(true);
 
     try {
@@ -102,6 +100,7 @@ const SignUpPage = () => {
           password: "",
           confirmPassword: "",
         });
+        console.log(response.data);
         setAccessToken(response.data.accessToken, response.data.userId);
       } else {
         toast.error(response.data.message || "Signup failed");

@@ -48,6 +48,16 @@ io.on("connection", async (socket) => {
   socket.on("message", (message) => {
     log.info("The user messaged", message);
   });
+
+  socket.on("typing", (data) => {
+    const recipientSocketId = getReceiverSocketId(data.receiverId);
+    if (recipientSocketId) {
+      io.to(recipientSocketId).emit("typing", {
+        userId: data.userId,
+        isTyping: data.isTyping,
+      });
+    }
+  });
 });
 
 export { io, app, server };

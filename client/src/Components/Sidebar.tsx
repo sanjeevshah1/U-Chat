@@ -63,6 +63,8 @@ const Sidebar = ({ filter, onClose }: sidebarProps) => {
   const handleContactClick = (contact: SelectContactType) => {
     if (!selectedChat) {
       setSelectedChat(contact);
+    } else if (contact.id !== selectedChat.id) {
+      setSelectedChat(contact);
     } else {
       setSelectedChat(undefined);
     }

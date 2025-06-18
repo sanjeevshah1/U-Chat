@@ -70,6 +70,7 @@ export const signUpHandler = async (
       success: true,
       message: "User Signed Up Succesfully, refresh token set in cookies",
       accessToken,
+      userId: createdUser._id,
     });
   } catch (error: unknown) {
     res.status(500).json({
@@ -127,14 +128,12 @@ export const loginHandler = async (
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       });
 
-      res
-        .status(200)
-        .json({
-          success: true,
-          message: "logged in succesfully",
-          accessToken,
-          userId: id,
-        });
+      res.status(200).json({
+        success: true,
+        message: "logged in succesfully",
+        accessToken,
+        userId: id,
+      });
     }
   } catch (error: unknown) {
     res.status(500).json({
