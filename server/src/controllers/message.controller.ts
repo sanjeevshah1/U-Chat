@@ -11,7 +11,7 @@ export const getMessagesHandler = async (req: Request, res: Response) => {
     console.log("the user id is", userId);
     console.log("the friend id is", friendId);
     if (!friendId) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: "Friend ID is required",
       });

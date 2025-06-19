@@ -222,6 +222,7 @@ export const getProfileHandler = async (req: Request, res: Response) => {
     });
   }
 };
+
 export const updateProfilePictureHandler = async (
   req: Request,
   res: Response,

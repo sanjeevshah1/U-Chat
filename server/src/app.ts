@@ -1,4 +1,4 @@
-import express, { Express } from "express";
+import express from "express";
 import config from "config";
 import dotenv from "dotenv";
 import cors, { CorsOptions } from "cors";
