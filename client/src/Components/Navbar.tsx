@@ -190,7 +190,7 @@ const Navbar = () => {
                     setShowAddFriend(true);
                     setIsMobileMenuOpen(false);
                   }}
-                  className="flex items-center gap-3 px-3 py-3 rounded-lg text-primary-content hover:bg-primary/90 transition-colors"
+                  className="flex items-center gap-3 px-3 py-3 rounded-lg text-base-content hover:bg-primary/90 transition-colors"
                 >
                   <UserPlus className="w-5 h-5" />
                   <span>Add Friend</span>
