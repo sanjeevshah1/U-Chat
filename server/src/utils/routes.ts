@@ -4,7 +4,6 @@ import contactRoute from "../routes/contact.route";
 import User from "../models/user.model";
 import messageRoutes from "../routes/message.routes";
 
-// import messageRoutes from "../routes/message.routes";
 const routes = (app: Express) => {
   //Test Route
   app.get("/api/", (req, res) => {

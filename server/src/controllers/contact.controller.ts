@@ -113,7 +113,6 @@ export const addContactHandler = async (
       });
 
       const recipientSocketId = onlineUsers.get(recipientId);
-      console.log("The recipient socket id is", recipientSocketId);
       if (recipientSocketId) {
         io.to(recipientSocketId).emit("friendRequestReceived");
       }
@@ -138,7 +137,6 @@ export const HandleContactRequestHandler = async (
 ) => {
   try {
     const { requestId, action } = req.params;
-    console.log("the action is", action);
     const handledContact = await handleRequest(requestId, action);
     res.status(200).json({
       success: true,

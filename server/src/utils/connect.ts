@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import config from "config";
 import logger from "./logger";
 const connect = async () => {
   const mongoUrl = process.env.MONGO_URL!;

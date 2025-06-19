@@ -21,7 +21,6 @@ const validateResource =
             message: err.message,
           };
         });
-        console.log(formattedError);
         res.status(400).send({
           success: false,
           errors: formattedError,

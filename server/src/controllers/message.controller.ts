@@ -3,13 +3,12 @@ import Message from "../models/message.model";
 import cloudinary from "../utils/cloudinary.utils";
 import { getReceiverSocketId, io } from "../utils/socket";
 import { Types } from "mongoose";
+import logger from "../utils/logger";
 
 export const getMessagesHandler = async (req: Request, res: Response) => {
   try {
     const { id: friendId } = req.params;
     const userId = res.locals.user._id as Types.ObjectId;
-    console.log("the user id is", userId);
-    console.log("the friend id is", friendId);
     if (!friendId) {
       res.status(400).json({
         success: false,
@@ -24,15 +23,13 @@ export const getMessagesHandler = async (req: Request, res: Response) => {
       ],
     }).sort({ createdAt: 1 }); // Sort messages by timestamp (oldest first)
 
-    console.log("Fetched messages:", messages);
-
     res.status(200).json({
       success: true,
       message: "Messages fetched successfully",
       messages,
     });
   } catch (error: unknown) {
-    console.error("Error fetching messages:", error);
+    logger.error("Error fetching messages:", error);
     res.status(500).json({
       success: false,
       message: error instanceof Error ? error.message : "Internal server error",
@@ -41,12 +38,10 @@ export const getMessagesHandler = async (req: Request, res: Response) => {
 };
 
 export const sendMessageHandler = async (req: Request, res: Response) => {
-  console.log("Executing message send");
   try {
     const { id: friendId } = req.params;
     const userId = res.locals.user._id;
     const { text, image } = req.body;
-    console.log("the message is", text);
     let imageUrl = "";
     if (image) {
       //base 64 image

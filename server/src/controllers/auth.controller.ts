@@ -193,7 +193,6 @@ export const updateProfileHandler = async (
   try {
     const id = res.locals.user._id;
     const user = await updateUser({ id, updates: req.body.updates });
-    console.log("the update is running");
     res.status(200).json({
       success: true,
       message: "Profile Updated Succesfully",

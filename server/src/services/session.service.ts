@@ -6,7 +6,6 @@ import { findUser } from "./user.service";
 import redis from "../utils/redis.utils";
 
 export async function createSession(user: string, userAgent: string) {
-  console.log("creatSession service executing");
   try {
     const session = await Session.create({
       user,
