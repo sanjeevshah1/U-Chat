@@ -1,13 +1,9 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://u-chat-0660.onrender.com/api",
+  baseURL: `${import.meta.env.VITE_API_URL}/api`,
   withCredentials: true,
 });
-// const api = axios.create({
-//   baseURL: "http://localhost:1337/api",
-//   withCredentials: true,
-// });
 
 // Add a request interceptor
 api.interceptors.request.use(

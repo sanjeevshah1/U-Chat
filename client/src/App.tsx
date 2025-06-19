@@ -23,7 +23,6 @@ function App() {
       disconnect();
     }
   }, [isLoggedIn, connect, disconnect]);
-  console.log("The value of log is", isLoggedIn);
   return (
     <>
       <Navbar />
