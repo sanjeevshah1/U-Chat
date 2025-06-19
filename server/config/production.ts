@@ -1,6 +1,3 @@
-import fs from "fs";
-const publicKey = fs.readFileSync("./public.pem", "utf-8");
-const privateKey = fs.readFileSync("./private.pem", "utf-8");
 export default {
   PORT: 1337,
   mongoUrl:
@@ -10,6 +7,4 @@ export default {
     credentials: true,
   },
   saltFactor: 10,
-  publicKey: publicKey,
-  privateKey: privateKey,
 };

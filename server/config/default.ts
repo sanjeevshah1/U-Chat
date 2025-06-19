@@ -1,4 +1,3 @@
-import fs from "fs";
 export default {
   PORT: 1337,
   mongoUrl: "mongodb://localhost:27017/u-chat",

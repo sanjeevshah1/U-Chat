@@ -21,8 +21,9 @@ redis.on("connect", () => {
   console.log("✅ Connected to Redis");
 });
 
-redis.on("error", (err) => {
-  console.error("Redis error:", err);
+redis.on("error", (err: unknown) => {
+  if (err instanceof Error) console.error("Redis error:", err.message);
+  else console.error("Redis error:", err);
 });
 
 export default redis;
