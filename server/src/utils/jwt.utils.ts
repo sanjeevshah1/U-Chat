@@ -1,5 +1,4 @@
 import jwt from "jsonwebtoken";
-import config from "config";
 import { DecodedUser } from "../types";
 
 //sign in private key
@@ -8,6 +7,7 @@ export function signinJwt(
   options?: jwt.SignOptions | undefined,
 ): string {
   const privateKey = process.env.PRIVATE_KEY!;
+  console.log("the private key is", privateKey);
   return jwt.sign(object, privateKey, {
     ...(options && options),
     algorithm: "RS256",
@@ -21,6 +21,7 @@ export function verifyJwt(token: string): {
   expired: boolean;
 } {
   const publicKey = process.env.PUBLIC_KEY!;
+  console.log("the public key is", publicKey);
   try {
     const decoded = jwt.verify(token, publicKey);
     return {
