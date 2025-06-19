@@ -7,7 +7,7 @@ export function signinJwt(
   object: object,
   options?: jwt.SignOptions | undefined,
 ): string {
-  const privateKey = config.get<string>("privateKey");
+  const privateKey = process.env.PRIVATE_KEY!;
   return jwt.sign(object, privateKey, {
     ...(options && options),
     algorithm: "RS256",
@@ -20,7 +20,7 @@ export function verifyJwt(token: string): {
   decoded: DecodedUser | null;
   expired: boolean;
 } {
-  const publicKey = config.get<string>("publicKey");
+  const publicKey = process.env.PUBLIC_KEY!;
   try {
     const decoded = jwt.verify(token, publicKey);
     return {

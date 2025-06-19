@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only  src/app.ts",
-    "lint": "eslint .",
-    "test": "vitest"
-  },
+  "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
+  "build": "tsc",
+  "lint": "eslint .",
+  "test": "vitest",
+  "start": "node build/src/app.js"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -19,6 +21,7 @@
     "config": "^4.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "dayjs": "^1.11.13",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "ioredis": "^5.6.1",

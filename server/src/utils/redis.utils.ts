@@ -1,8 +1,20 @@
 import Redis from "ioredis";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const host = process.env.REDIS_HOST;
+const port = Number(process.env.REDIS_PORT);
+const password = process.env.REDIS_PASSWORD;
+
+if (!host || isNaN(port)) {
+  throw new Error("❌ Invalid REDIS_HOST or REDIS_PORT");
+}
 
 const redis = new Redis({
-  host: "127.0.0.1",
-  port: 6379,
+  host,
+  port,
+  password,
 });
 
 redis.on("connect", () => {
