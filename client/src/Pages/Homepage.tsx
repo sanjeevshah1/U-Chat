@@ -85,7 +85,7 @@ const Homepage = () => {
           {selectedChat ? (
             <Chat />
           ) : (
-            <div className="text-center text-gray-500 p-8">
+            <div className="text-center text-gray-500 p-8 my-auto">
               <Contact className="w-16 h-16 mx-auto mb-4 text-gray-300" />
               <h3 className="text-lg font-medium mb-2">Select a contact</h3>
               <p className="text-sm">Choose a contact to start chatting</p>
