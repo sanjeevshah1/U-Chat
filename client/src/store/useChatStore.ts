@@ -28,8 +28,8 @@ const useChatStore = create<ChatStoreState>((set, get) => ({
 
     const socket = io(
       import.meta.env.MODE === "production"
-        ? `${import.meta.env.VITE_API_URL}/api`
-        : "http://localhost:1337/api",
+        ? import.meta.env.VITE_API_URL
+        : "http://localhost:1337",
       {
         query: {
           userId: localStorage.getItem("userId"),
