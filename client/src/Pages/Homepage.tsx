@@ -30,7 +30,7 @@ const Homepage = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-5rem)] flex bg-gray-50 overflow-hidden">
+    <div className="flex-1 flex flex-col md:flex-row bg-gray-50 overflow-hidden">
       {/* Desktop Sidebar */}
       <div className="hidden md:block w-80">
         <Sidebar

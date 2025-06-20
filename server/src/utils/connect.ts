@@ -1,7 +1,10 @@
 import mongoose from "mongoose";
 import logger from "./logger";
 const connect = async () => {
-  const mongoUrl = process.env.MONGO_URL!;
+  const mongoUrl =
+    process.env.NODE_ENV === "development"
+      ? "mongodb://localhost:27017/u-chat"
+      : process.env.MONGO_URL!;
   try {
     await mongoose.connect(mongoUrl);
     logger.info(`Connected to Database : ${mongoUrl.split("appName=")[1]}`);

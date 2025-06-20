@@ -24,7 +24,7 @@ function App() {
     }
   }, [isLoggedIn, connect, disconnect]);
   return (
-    <>
+    <div className="h-screen flex flex-col">
       <Navbar />
       <Routes>
         <Route path="/" element={isLoggedIn ? <Homepage /> : <Login />} />
@@ -67,7 +67,7 @@ function App() {
           },
         }}
       />
-    </>
+    </div>
   );
 }
 

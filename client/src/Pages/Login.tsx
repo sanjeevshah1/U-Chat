@@ -39,7 +39,7 @@ const LoginPage = () => {
     }
   };
   return (
-    <div className="h-[calc(100vh-5rem)] border-t border-white/20 grid md:grid-cols-2">
+    <div className="flex-1 border-t border-white/20 grid md:grid-cols-2">
       {/* Left Side - Form */}
       <div className="flex flex-col justify-center items-center p-6 sm:p-12">
         <div className="w-full max-w-md space-y-8">
