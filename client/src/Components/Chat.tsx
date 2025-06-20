@@ -342,7 +342,7 @@ const Chat = () => {
 
   if (!selectedChat) {
     return (
-      <div className="flex items-center justify-center h-full bg-gray-50">
+      <div className="flex items-center justify-center max-h-[calc(100vh-8rem)] md:max-h-[calc(100vh-4.7rem)] bg-gray-50">
         <div className="text-center">
           <div className="w-16 h-16 bg-gray-300 rounded-full mx-auto mb-4"></div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -355,9 +355,9 @@ const Chat = () => {
       </div>
     );
   }
-
+  //
   return (
-    <div className="flex flex-col w-full h-full max-h-[calc(100vh-4.7rem)] border-t-4 bg-white">
+    <div className="flex-1 flex flex-col w-full h-full max-h-[calc(100vh-8rem)] md:max-h-[calc(100vh-4.7rem)] border-t-4 bg-white">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white shadow-sm">
         <div className="flex items-center space-x-3">
@@ -431,19 +431,19 @@ const Chat = () => {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+      <div className="flex-1 overflow-y-auto h-full bg-gray-50">
         {isLoading ? (
           <div className="flex justify-center items-center h-32">
             <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : messages.length === 0 ? (
-          <div className="flex justify-center items-center h-32">
+          <div className="flex justify-center items-center h-full">
             <p className="text-gray-500">
               No messages yet. Start the conversation!
             </p>
           </div>
         ) : (
-          <>
+          <div className="p-4 space-y-4">
             {messages.map((message, index) => (
               <div
                 key={message._id || index}
@@ -486,7 +486,7 @@ const Chat = () => {
 
             {/* Animated Typing Indicator */}
             {isTyping && <TypingIndicator />}
-          </>
+          </div>
         )}
         <div ref={messagesEndRef} />
       </div>
