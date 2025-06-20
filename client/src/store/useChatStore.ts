@@ -26,15 +26,20 @@ const useChatStore = create<ChatStoreState>((set, get) => ({
     // Don't create a new connection if one already exists
     if (get().socket) return;
 
-    const socket = io("http://localhost:1337", {
-      query: {
-        userId: localStorage.getItem("userId"),
-      },
-      withCredentials: true,
-      transports: ["websocket"],
-      reconnectionAttempts: 3,
-      reconnectionDelay: 1000,
-    });
+    const socket = io(
+      import.meta.env.MODE === "production"
+        ? `${import.meta.env.VITE_API_URL}/api`
+        : "http://localhost:1337/api",
+      {
+        query: {
+          userId: localStorage.getItem("userId"),
+        },
+        withCredentials: true,
+        transports: ["websocket"],
+        reconnectionAttempts: 3,
+        reconnectionDelay: 1000,
+      }
+    );
 
     set({ socket });
 
