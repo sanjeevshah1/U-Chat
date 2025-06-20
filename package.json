@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/sanjeevshah1/U-Chat/issues"
   },
-  "homepage": "https://github.com/sanjeevshah1/U-Chat#readme"
+  "homepage": "https://github.com/sanjeevshah1/U-Chat#readme",
+  "devDependencies": {
+    "@types/react-dom": "^19.1.6"
+  }
 }
