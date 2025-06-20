@@ -1,54 +1,76 @@
-# React + TypeScript + Vite
+# U-Chat Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend for U-Chat, built with React, TypeScript, Vite, Tailwind CSS, and Zustand.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Real-time chat UI
+- Authentication (login/signup)
+- Friend requests & contacts
+- Responsive design
+- Toast notifications
 
-## Expanding the ESLint configuration
+## Project Structure
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```
+src/
+  Components/   # Reusable UI components
+    - AddContactModlal.tsx
+    - AuthImagePattern.tsx
+    - AuthRequired.tsx
+    - Chat.tsx
+    - FriendRequestsModal.tsx
+    - Navbar.tsx
+    - Sidebar.tsx
+  Pages/        # Main pages
+    - Homepage.tsx
+    - Login.tsx
+    - Profile.tsx
+    - Settings.tsx
+    - Signup.tsx
+  store/        # Zustand stores
+    - useAuthStore.ts
+    - useChatStore.ts
+    - useRequestStore.ts
+  utils/        # Utility functions
+    - axios.ts
+    - utils.ts
+  App.tsx       # Main app component
+  main.tsx      # Entry point
+  types.ts      # TypeScript types
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Main Dependencies
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- React 19
+- TypeScript
+- Vite
+- Tailwind CSS & DaisyUI
+- Zustand
+- Socket.IO Client
+- React Router DOM
+- Axios
+- Zod
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+## Setup
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Configure environment variables in `.env` (see `.env.example`).
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+## Scripts
+
+- `npm run dev` — Start dev server
+- `npm run build` — Build for production
+- `npm run lint` — Lint code
+- `npm run preview` — Preview production build
+
+## License
+
+ISC
