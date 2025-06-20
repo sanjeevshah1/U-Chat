@@ -158,7 +158,7 @@ const SignUpPage = () => {
   const passwordStrength = getPasswordStrength(formData.password);
 
   return (
-    <div className="grid md:grid-cols-2  h-[calc(100vh-5rem)] border-t-1 border-white/20 ">
+    <div className="flex-1 grid md:grid-cols-2 border-t-1 border-white/20 ">
       {/* Left side - Form */}
       <div className="flex flex-col pt-6 justify-center items-center bg-background">
         <div className="w-full max-w-md space-y-6">
@@ -363,9 +363,9 @@ const SignUpPage = () => {
           </div>
 
           {/* Sign In Link */}
-          <div className="text-center">
-            <div className="bg-muted/30 border border-border rounded-lg p-4">
-              <p className="text-sm sm:text-base text-muted-foreground">
+          <div className="w-[75%] lg:w-auto mx-auto text-center">
+            <div className="bg-muted/30">
+              <p className="text-sm md:text-base text-muted-foreground">
                 Already have an account?{" "}
                 <Link
                   to="/login"
