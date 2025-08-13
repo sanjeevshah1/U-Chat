@@ -6,7 +6,7 @@ export function signinJwt(
   object: object,
   options?: jwt.SignOptions | undefined,
 ): string {
-  const privateKey = process.env.PRIVATE_KEY!.replace(/\\n/g, "\n");
+  const privateKey = process.env.PRIVATE_KEY!.trim().replace(/\\n/g, "\n");
   return jwt.sign(object, privateKey, {
     ...(options && options),
     algorithm: "RS256",
@@ -19,7 +19,7 @@ export function verifyJwt(token: string): {
   decoded: DecodedUser | null;
   expired: boolean;
 } {
-  const publicKey = process.env.PUBLIC_KEY!.replace(/\\n/g, "\n");
+  const publicKey = process.env.PUBLIC_KEY!.trim().replace(/\\n/g, "\n");
   try {
     const decoded = jwt.verify(token, publicKey);
     return {

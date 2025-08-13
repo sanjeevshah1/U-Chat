@@ -5,9 +5,9 @@ import User from "../models/user.model";
 import messageRoutes from "../routes/message.routes";
 
 const routes = (app: Express) => {
-  //Test Route
-  app.get("/api/", (req, res) => {
-    res.status(200).json({ message: "Hello World" });
+  //Health Check
+  app.get("/api/healthcheck", (req, res) => {
+    res.status(200).json({ message: "The server is healthy" });
   });
   app.get("/api/users", async (req, res) => {
     const users = await User.find({});
